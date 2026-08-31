@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Camera - Smart Connect</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f7fb;
+    color: #222;
+}
+
+header {
+    background: white;
+    padding: 18px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+header h1 {
+    font-size: 26px;
+}
+
+header p {
+    color: #777;
+    margin-top: 5px;
+}
+
+nav {
+    background: #222;
+    padding: 12px;
+    text-align: center;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 8px;
+    font-size: 14px;
+}
+
+.container {
+    width: 92%;
+    max-width: 600px;
+    margin: 30px auto;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+    margin-bottom: 12px;
+}
+
+.card p {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 12px 18px;
+    margin: 5px;
+    border: none;
+    border-radius: 10px;
+    background: #222;
+    color: white;
+    font-size: 15px;
+}
+
+.open {
+    background: #333;
+}
+
+.photo {
+    background: #16803c;
+}
+
+.stop {
+    background: #c62828;
+}
+
+video,
+img {
+    width: 100%;
+    border-radius: 14px;
+    margin-top: 20px;
+}
+
+#photo {
+    display: none;
+}
+
+footer {
+    text-align: center;
+    color: #888;
+    font-size: 12px;
+    margin-top: 30px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Smart Connect</h1>
+<p>Camera Permission Demo</p>
+</header>
+
+<nav>
+<a href="index.html">Home</a>
+<a href="camera.html">Camera</a>
+<a href="location.html">Location</a>
+<a href="about.html">About</a>
+</nav>
+
+<div class="container">
+
+<div class="card">
+
+<h2>📷 Camera</h2>
+
+<p>
+This demo uses your browser camera only after
+you give permission.
+</p>
+
+<button class="open" onclick="openCamera()">
+📷 Open Camera
+</button>
+
+<button class="photo" onclick="takePhoto()">
+📸 Take Photo
+</button>
+
+<button class="stop" onclick="stopCamera()">
+⛔ Stop Camera
+</button>
+
+<video id="video" autoplay playsinline></video>
+
+<img id="photo" alt="Captured photo">
+
+</div>
+
+</div>
+
+<footer>
+Permission-based demo • Your privacy matters
+</footer>
+
+<script>
+
+let stream = null;
+
+async function openCamera() {
+
+    if (!window.isSecureContext) {
+        alert("Camera માટે HTTPS જરૂરી છે.");
+        return;
+    }
+
+    try {
+
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false
+        });
+
+        document.getElementById("video").srcObject = stream;
+
+    } catch (error) {
+
+        alert("Camera permission આપવામાં આવી નથી.");
+
+    }
+}
+
+function takePhoto() {
+
+    if (!stream) {
+        alert("પહેલા Camera Open કરો અને permission આપો.");
+        return;
+    }
+
+    const video = document.getElementById("video");
+
+    const canvas = document.createElement("canvas");
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    canvas.getContext("2d").drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    const photo = document.getElementById("photo");
+
+    photo.src = canvas.toDataURL("image/png");
+
+    photo.style.display = "block";
+}
+
+function stopCamera() {
+
+    if (stream) {
+
+        stream.getTracks().forEach(
+            track => track.stop()
+        );
+
+        stream = null;
+
+        document.getElementById("video").srcObject = null;
+    }
+}
+
+</script>
+
+</body>
+</html>
